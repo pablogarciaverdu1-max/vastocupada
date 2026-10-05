@@ -176,11 +176,12 @@
   .ficha-nombre { font-family: var(--titulo); font-weight: 700; font-size: 18px; line-height: 1.15; }
   .ficha-desc { font-size: 13px; line-height: 1.35; color: var(--tinta); }
   .ficha-accion { display: flex; align-items: center; flex-shrink: 0; }
-  .mas { width: 52px; height: 52px; border-radius: 50%; border: 0; font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center; background: var(--noche); color: #fff; transition: background-color .15s; }
-  .mas:hover { background: var(--noche-hover); }
+  /* Sin elegir: check gris. Elegido: "+1" en naranja. */
+  .mas { width: 52px; height: 52px; border-radius: 50%; border: 0; font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center; background: var(--linea); color: var(--gris); transition: background-color .15s, color .15s; }
+  .mas:hover { background: #c9d0df; color: var(--noche); }
   .mas[aria-pressed="true"] { background: var(--naranja); color: var(--noche); }
   .mas[aria-pressed="true"]:hover { background: var(--naranja-hover); }
-  .mas:disabled { background: #fff; border: 2px solid var(--borde); color: var(--gris-claro); }
+  .mas:disabled { background: #fff; border: 2px solid var(--linea); color: var(--borde); }
   .aviso { min-height: 1em; padding: 16px 20px; text-align: center; font-size: 14px; font-weight: 700; }
   .panel { display: none; }
 
@@ -426,10 +427,10 @@
         '<img class="ficha-foto" src="' + foto(p) + '" alt="' + esc(p.nombre) + '">' +
         '<div class="ficha-cuerpo"><div class="ficha-texto"><p class="categoria">' + esc(p.categoria) + '</p><h2 class="ficha-nombre">' + esc(p.nombre) + '</h2><p class="ficha-desc">' + esc(p.descripcion) + "</p></div>" +
         '<div class="ficha-accion"><button type="button" class="mas" data-plato="' + esc(p.id) + '" aria-pressed="' + sel + '" aria-label="Añadir ' + esc(p.nombre) + '"' +
-        (bloq ? ' disabled title="Ya tienes 5 platos"' : ' title="' + (sel ? "Quitar del pedido" : "Añadir al pedido") + '"') + ">" + (sel ? I.check : "+1") + "</button></div></div></li>";
+        (bloq ? ' disabled title="Ya tienes 5 platos"' : ' title="' + (sel ? "Quitar del pedido" : "Añadir al pedido") + '"') + ">" + (sel ? "+1" : I.check) + "</button></div></div></li>";
     }).join("");
     return '<div class="contenedor con-barra"><div class="platos-grid"><main>' +
-      cabecera("#/", "Volver al inicio", "¿Qué te apetece?", "Máximo 5 platos y sin repetir. Elige con hambre.") +
+      cabecera("#/", "Volver al inicio", "¿Qué te apetece?", "Máximo 5 platos. Elige con hambre.") +
       '<ul class="fichas">' + fichas + '</ul><p class="aviso" role="status">' + (lleno ? "Has llegado a los 5 platos. Quita uno si quieres cambiar." : "") + "</p></main>" +
       '<aside class="panel" aria-label="Tu pedido"><div class="panel-caja"><div class="panel-cabeza"><h2>Tu pedido</h2>' + contador() + "</div>" +
       (st.platos.length ? listaElegidos(true) : '<p class="panel-vacio">Aquí no hay nada todavía. Tu nevera te está mirando con preocupación.</p>') +
