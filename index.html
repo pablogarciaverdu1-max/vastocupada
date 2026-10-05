@@ -17,6 +17,7 @@
   - foto: el nombre de una foto incluida en este archivo (berenjena, lasana,
     hamburguesa-pollo, orecchiette) o la ruta/URL de una imagen nueva,
     por ejemplo "platos/pollo-curry.jpg" si la subes al repositorio.
+    Vacía ("") = se muestra un dibujo de "foto en el horno" hasta que la tengas.
   ======================================================================
 -->
 <script id="carta" type="application/json">
@@ -48,6 +49,41 @@
     "nombre": "Orecchiette de ternera y espárragos",
     "descripcion": "Orejitas de pasta que escuchan tus penas de la semana.",
     "foto": "orecchiette"
+  },
+  {
+    "id": "pollo-horno",
+    "categoria": "Pollo",
+    "nombre": "Pollo al horno con patatas",
+    "descripcion": "El clásico de domingo, pero un martes cualquiera y sin bandeja que fregar.",
+    "foto": ""
+  },
+  {
+    "id": "noquis-pollo",
+    "categoria": "Pasta",
+    "nombre": "Ñoquis con pollo",
+    "descripcion": "Bolitas de felicidad que no te piden nada a cambio. Ni siquiera que cocines.",
+    "foto": ""
+  },
+  {
+    "id": "pollo-curry",
+    "categoria": "Pollo",
+    "nombre": "Pollo al curry con garbanzos",
+    "descripcion": "Un viaje a la India sin pasaporte y sin pasar por el súper.",
+    "foto": ""
+  },
+  {
+    "id": "coliflor-gratinada",
+    "categoria": "Verdura",
+    "nombre": "Coliflor gratinada",
+    "descripcion": "La coliflor que te reconcilia con la coliflor. El gratinado lo arregla todo.",
+    "foto": ""
+  },
+  {
+    "id": "pasta-wok",
+    "categoria": "Pasta",
+    "nombre": "Pasta con verduras al wok",
+    "descripcion": "Salteada a fuego vivo, como tu semana, pero con mejor final.",
+    "foto": ""
   }
 ]
 </script>
@@ -275,7 +311,16 @@
   var MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
   var DIAS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
 
-  function foto(p) { return FOTOS[p.foto] || p.foto; }
+  // Dibujo provisional para los platos que aún no tienen foto
+  var SIN_FOTO = "data:image/svg+xml," + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><rect width="400" height="400" fill="#14213D"/>' +
+    '<circle cx="200" cy="178" r="96" fill="none" stroke="#FF9F1C" stroke-width="14"/>' +
+    '<circle cx="200" cy="178" r="58" fill="#FF9F1C" opacity=".25"/>' +
+    '<path d="M70 110v70M55 110v35a15 15 0 0 0 30 0v-35M70 180v80" stroke="#FF9F1C" stroke-width="10" stroke-linecap="round" fill="none"/>' +
+    '<path d="M330 110c-22 10-22 60 0 70v80" stroke="#FF9F1C" stroke-width="10" stroke-linecap="round" fill="none"/>' +
+    '<text x="200" y="335" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#FFFFFF">Foto en el horno</text></svg>');
+  function tieneFoto(p) { return !!p.foto; }
+  function foto(p) { return p.foto ? (FOTOS[p.foto] || p.foto) : SIN_FOTO; }
   function plato(id) { for (var i = 0; i < PLATOS.length; i++) if (PLATOS[i].id === id) return PLATOS[i]; return null; }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
 
@@ -340,8 +385,9 @@
   }
 
   function vInicio() {
-    var mini = PLATOS.map(function (p) { return '<img src="' + foto(p) + '" alt="' + esc(p.nombre) + '">'; }).join("");
-    var col = PLATOS.slice(0, 4).map(function (p) { return '<li><img src="' + foto(p) + '" alt="' + esc(p.nombre) + '"></li>'; }).join("");
+    var conFoto = PLATOS.filter(tieneFoto).slice(0, 4);
+    var mini = conFoto.map(function (p) { return '<img src="' + foto(p) + '" alt="' + esc(p.nombre) + '">'; }).join("");
+    var col = conFoto.map(function (p) { return '<li><img src="' + foto(p) + '" alt="' + esc(p.nombre) + '"></li>'; }).join("");
     return '<main class="inicio"><div class="inicio-grid"><div class="inicio-bloque">' +
       '<div class="inicio-marca"><div class="raya" aria-hidden="true"></div><h1 class="marca">VASTO<br>CUPADA</h1><p class="lema">Así es, vas to ocupada. Déjate cocinar.</p></div>' +
       '<div class="miniaturas-fila"><div class="miniaturas">' + mini + '</div><p class="nota">Hasta 5 platos distintos,<br>listos para toda la semana.</p></div>' +
