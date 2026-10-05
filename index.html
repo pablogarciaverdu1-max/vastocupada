@@ -53,9 +53,12 @@
 </script>
 
 <script>
-  // Dirección a la que se envían los pedidos (guardado + email).
-  // Vacía = modo demostración: el pedido NO se guarda ni se envía.
-  window.VASTO_ENDPOINT = "";
+  // ======================================================================
+  // DIRECCIÓN DE LA COCINA: pega aquí entre comillas la URL de tu
+  // Apps Script (termina en /exec). Vacía = modo demostración: el pedido
+  // NO se guarda ni te llega email.
+  // ======================================================================
+  window.VASTO_ENDPOINT = "https://script.google.com/macros/s/AKfycbyZNAyOvRIi5qhJGN2gKm6CrhtFzest7m2nbR5l9tc9zVUo0Nh82ula85rFJRPxFLTV/exec";
 </script>
 
 <style>
@@ -303,13 +306,17 @@
 
   // ---------------- Estado (se guarda en sessionStorage) ----------------
   var CLAVE = "vastocupada-pedido";
-  function vacio() { return { platos: [], fecha: null, cliente: { nombre: "", telefono: "", direccion: "", observaciones: "" }, confirmado: null }; }
+  function vacio() { return { platos: [], fecha: null, cliente: { nombre: "", telefono: "", direccion: "", observaciones: "" }, confirmado: null, pedidoId: null }; }
   var st = vacio();
   try {
     var g = JSON.parse(sessionStorage.getItem(CLAVE) || "null");
     if (g) { st = Object.assign(vacio(), g); st.cliente = Object.assign(vacio().cliente, g.cliente || {}); }
   } catch (e) {}
   st.platos = st.platos.filter(function (id) { return !!plato(id); });
+  function nuevoId() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 12);
+  }
   function guardar() { try { sessionStorage.setItem(CLAVE, JSON.stringify(st)); } catch (e) {} }
 
   var ui = { enviando: false, error: null, telTocado: false, vista: null };
@@ -540,8 +547,11 @@
     if (fallo) { ui.error = fallo; refrescarPedir(); return; }
     ui.enviando = true; ui.error = null; refrescarPedir();
 
+    // Mismo número en los reintentos: la cocina no lo apunta dos veces
+    if (!st.pedidoId) { st.pedidoId = nuevoId(); guardar(); }
     var completo = {
-      platos: pedido.platos.map(function (id) { var p = plato(id); return { id: p.id, nombre: p.nombre, categoria: p.categoria }; }),
+      id: st.pedidoId,
+      platos: pedido.platos.slice(),
       fechaEntrega: pedido.fecha,
       fechaEntregaTexto: fechaLarga(pedido.fecha),
       cliente: { nombre: st.cliente.nombre.trim(), telefono: st.cliente.telefono.trim(), direccion: st.cliente.direccion.trim(), observaciones: st.cliente.observaciones.trim() },
